@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>巻き絨毯計算</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#8b5a2b">
+
+<style>
+body {
+  font-family: system-ui, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background: #f4efe7;
+  color: #2f241b;
+}
+
+.app {
+  max-width: 480px;
+  margin: auto;
+  background: #fffaf3;
+  padding: 24px;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.15);
+}
+
+h1 {
+  font-size: 24px;
+  margin: 0 0 8px;
+}
+
+p {
+  color: #6d5b4b;
+  font-size: 14px;
+}
+
+label {
+  display: block;
+  margin-top: 16px;
+  font-weight: bold;
+}
+
+input {
+  width: 100%;
+  padding: 13px;
+  margin-top: 6px;
+  font-size: 17px;
+  border-radius: 12px;
+  border: 1px solid #c8b9a8;
+  box-sizing: border-box;
+}
+
+.result {
+  margin-top: 20px;
+  padding: 16px;
+  background: #eadcc9;
+  border-radius: 14px;
+}
+
+.result-title {
+  font-size: 14px;
+  color: #6d5b4b;
+}
+
+.big {
+  font-size: 26px;
+  font-weight: bold;
+  margin-top: 4px;
+}
+
+.note {
+  margin-top: 16px;
+  font-size: 12px;
+  color: #777;
+  line-height: 1.6;
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+  <h1>巻き絨毯計算</h1>
+  <p>巻かれた状態の外径・空洞・厚みから、概算の長さと畳数を計算します。</p>
+
+  <label>外径 D（cm）</label>
+  <input type="number" id="outer" placeholder="例：40">
+
+  <label>中心の空洞の直径 d（cm）</label>
+  <input type="number" id="inner" placeholder="例：5">
+
+  <label>絨毯の厚み t（cm）</label>
+  <input type="number" id="thick" step="0.1" placeholder="例：0.5">
+
+  <div class="result">
+    <div class="result-title">概算の巻き長さ</div>
+    <div class="big" id="lengthResult">-- m</div>
+  </div>
+
+  <label>巻かれていない辺の長さ／幅（cm）</label>
+  <input type="number" id="width" placeholder="例：182">
+
+  <div class="result">
+    <div class="result-title">概算面積</div>
+    <div class="big" id="areaResult">-- ㎡</div>
+
+    <div class="result-title" style="margin-top:12px;">概算畳数</div>
+    <div class="big" id="tatamiResult">-- 畳</div>
+  </div>
+
+  <div class="note">
+    ※ 1畳 = 1.62㎡ で計算。<br>
+    ※ 厚み5mmの場合は 0.5cm と入力。<br>
+    ※ 巻きの強さ、毛足、潰れ、楕円変形で誤差が出ます。
+  </div>
+</div>
+
+<script>
+function calculate() {
+  const D = parseFloat(document.getElementById("outer").value);
+  const d = parseFloat(document.getElementById("inner").value);
+  const t = parseFloat(document.getElementById("thick").value);
+  const width = parseFloat(document.getElementById("width").value);
+
+  const lengthResult = document.getElementById("lengthResult");
+  const areaResult = document.getElementById("areaResult");
+  const tatamiResult = document.getElementById("tatamiResult");
+
+  let lengthCm = null;
+
+  if (D > 0 && d >= 0 && t > 0 && D > d) {
+    lengthCm = Math.PI * (D * D - d * d) / (4 * t);
+    lengthResult.textContent = (lengthCm / 100).toFixed(2) + " m";
+  } else {
+    lengthResult.textContent = "-- m";
+  }
+
+  if (lengthCm && width > 0) {
+    const area = (lengthCm * width) / 10000;
+    const tatami = area / 1.62;
+
+    areaResult.textContent = area.toFixed(2) + " ㎡";
+    tatamiResult.textContent = tatami.toFixed(2) + " 畳";
+  } else {
+    areaResult.textContent = "-- ㎡";
+    tatamiResult.textContent = "-- 畳";
+  }
+}
+
+document.querySelectorAll("input").forEach(input => {
+  input.addEventListener("input", calculate);
+});
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("service-worker.js");
+}
+</script>
+</body>
+</html>
