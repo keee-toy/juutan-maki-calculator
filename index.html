@@ -3,12 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>巻き絨毯計算</title>
 
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#8b5a2b">
 
 <style>
+
 body {
   font-family: system-ui, sans-serif;
   margin: 0;
@@ -34,11 +36,12 @@ h1 {
 p {
   color: #6d5b4b;
   font-size: 14px;
+  line-height: 1.6;
 }
 
 label {
   display: block;
-  margin-top: 16px;
+  margin-top: 18px;
   font-weight: bold;
 }
 
@@ -50,6 +53,7 @@ input {
   border-radius: 12px;
   border: 1px solid #c8b9a8;
   box-sizing: border-box;
+  background: white;
 }
 
 .result {
@@ -65,96 +69,220 @@ input {
 }
 
 .big {
-  font-size: 26px;
+  font-size: 28px;
   font-weight: bold;
   margin-top: 4px;
 }
 
 .note {
-  margin-top: 16px;
+  margin-top: 18px;
   font-size: 12px;
   color: #777;
-  line-height: 1.6;
+  line-height: 1.7;
 }
+
 </style>
 </head>
 
 <body>
+
 <div class="app">
+
   <h1>巻き絨毯計算</h1>
-  <p>巻かれた状態の外径・空洞・厚みから、概算の長さと畳数を計算します。</p>
+
+  <p>
+    巻かれた状態の外径・中心空洞・厚みから、
+    概算の長さと畳数を計算します。
+  </p>
 
   <label>外径 D（cm）</label>
-  <input type="number" id="outer" placeholder="例：40">
+  <input
+    type="number"
+    id="outer"
+    placeholder="例：30"
+  >
 
   <label>中心の空洞の直径 d（cm）</label>
-  <input type="number" id="inner" placeholder="例：5">
+  <input
+    type="number"
+    id="inner"
+    placeholder="例：5"
+  >
 
   <label>絨毯の厚み t（cm）</label>
-  <input type="number" id="thick" step="0.1" placeholder="例：0.5">
+  <input
+    type="number"
+    id="thick"
+    step="0.1"
+    placeholder="例：1.2"
+  >
 
   <div class="result">
-    <div class="result-title">概算の巻き長さ</div>
-    <div class="big" id="lengthResult">-- m</div>
+
+    <div class="result-title">
+      概算の巻き長さ
+    </div>
+
+    <div class="big" id="lengthResult">
+      -- m
+    </div>
+
   </div>
 
   <label>巻かれていない辺の長さ／幅（cm）</label>
-  <input type="number" id="width" placeholder="例：182">
+
+  <input
+    type="number"
+    id="width"
+    placeholder="例：182"
+  >
 
   <div class="result">
-    <div class="result-title">概算面積</div>
-    <div class="big" id="areaResult">-- ㎡</div>
 
-    <div class="result-title" style="margin-top:12px;">概算畳数</div>
-    <div class="big" id="tatamiResult">-- 畳</div>
+    <div class="result-title">
+      概算面積
+    </div>
+
+    <div class="big" id="areaResult">
+      -- ㎡
+    </div>
+
+    <div
+      class="result-title"
+      style="margin-top:14px;"
+    >
+      概算畳数
+    </div>
+
+    <div class="big" id="tatamiResult">
+      -- 畳
+    </div>
+
   </div>
 
   <div class="note">
-    ※ 1畳 = 1.62㎡ で計算。<br>
-    ※ 厚み5mmの場合は 0.5cm と入力。<br>
-    ※ 巻きの強さ、毛足、潰れ、楕円変形で誤差が出ます。
+
+    ※ 畳数は 1畳 = 1.62㎡ で計算。<br>
+    ※ 厚み5mmの場合は「0.5」と入力。<br>
+    ※ 巻きの強さ・毛足・潰れ・楕円変形により誤差が出ます。
+
   </div>
+
 </div>
 
 <script>
-function calculate() {
-  const D = parseFloat(document.getElementById("outer").value);
-  const d = parseFloat(document.getElementById("inner").value);
-  const t = parseFloat(document.getElementById("thick").value);
-  const width = parseFloat(document.getElementById("width").value);
 
-  const lengthResult = document.getElementById("lengthResult");
-  const areaResult = document.getElementById("areaResult");
-  const tatamiResult = document.getElementById("tatamiResult");
+function calculate() {
+
+  const D = parseFloat(
+    document.getElementById("outer").value
+  );
+
+  const d = parseFloat(
+    document.getElementById("inner").value
+  );
+
+  const t = parseFloat(
+    document.getElementById("thick").value
+  );
+
+  const width = parseFloat(
+    document.getElementById("width").value
+  );
+
+  const lengthResult =
+    document.getElementById("lengthResult");
+
+  const areaResult =
+    document.getElementById("areaResult");
+
+  const tatamiResult =
+    document.getElementById("tatamiResult");
 
   let lengthCm = null;
 
-  if (D > 0 && d >= 0 && t > 0 && D > d) {
-    lengthCm = Math.PI * (D * D - d * d) / (4 * t);
-    lengthResult.textContent = (lengthCm / 100).toFixed(2) + " m";
+  // 巻き長さ計算
+  if (
+    D > 0 &&
+    d >= 0 &&
+    t > 0 &&
+    D > d
+  ) {
+
+    lengthCm =
+      Math.PI *
+      (D * D - d * d) /
+      (4 * t);
+
+    const lengthM = lengthCm / 100;
+
+    lengthResult.textContent =
+      lengthM.toFixed(2) + " m";
+
   } else {
-    lengthResult.textContent = "-- m";
+
+    lengthResult.textContent =
+      "-- m";
+
   }
 
-  if (lengthCm && width > 0) {
-    const area = (lengthCm * width) / 10000;
-    const tatami = area / 1.62;
+  // 面積・畳数計算
+  if (
+    lengthCm &&
+    width > 0
+  ) {
 
-    areaResult.textContent = area.toFixed(2) + " ㎡";
-    tatamiResult.textContent = tatami.toFixed(2) + " 畳";
+    const area =
+      (lengthCm * width) / 10000;
+
+    // 元の畳数
+    const tatamiRaw =
+      area / 1.62;
+
+    // 0.5刻みに丸め
+    const tatami =
+      Math.round(tatamiRaw * 2) / 2;
+
+    areaResult.textContent =
+      area.toFixed(2) + " ㎡";
+
+    tatamiResult.textContent =
+      tatami.toFixed(1) + " 畳";
+
   } else {
-    areaResult.textContent = "-- ㎡";
-    tatamiResult.textContent = "-- 畳";
+
+    areaResult.textContent =
+      "-- ㎡";
+
+    tatamiResult.textContent =
+      "-- 畳";
+
   }
+
 }
 
-document.querySelectorAll("input").forEach(input => {
-  input.addEventListener("input", calculate);
-});
+// 入力時に自動計算
+document
+  .querySelectorAll("input")
+  .forEach(input => {
 
+    input.addEventListener(
+      "input",
+      calculate
+    );
+
+  });
+
+// PWA用 Service Worker
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js");
+
+  navigator.serviceWorker.register(
+    "service-worker.js"
+  );
+
 }
+
 </script>
+
 </body>
 </html>
